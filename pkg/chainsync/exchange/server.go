@@ -255,7 +255,7 @@ func GatherMessages(cr chainReader, mr messageStore, ts *block.TipSet) ([]*types
 		secpkincl = append(secpkincl, smi)
 	}
 
-	blsmsgs, err := mr.LoadUnsinedMessagesFromCids(blscids)
+	blsmsgs, err := mr.LoadUnsignedMessagesFromCids(blscids)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}

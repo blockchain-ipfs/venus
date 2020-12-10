@@ -29,10 +29,11 @@ const (
 	jsonrpcAPIFile        = "api"
 	configFilename        = "config.json"
 	tempConfigFilename    = ".config.json.temp"
-	lockFile              = "repo.lock"
+	lockFile               = "repo.lock"
 	versionFilename       = "version"
 	walletDatastorePrefix = "wallet"
 	chainDatastorePrefix  = "chain"
+	metaDatastorePrefix   = "metadata"
 	// dealsDatastorePrefix   = "deals"
 	snapshotStorePrefix    = "snapshots"
 	snapshotFilenamePrefix = "snapshot"
@@ -62,6 +63,7 @@ type FSRepo struct {
 	keystore  keystore.Keystore
 	walletDs  Datastore
 	chainDs   Datastore
+	metaDs    Datastore
 
 	// lockfile is the file system lock to prevent others from opening the same repo.
 	lockfile io.Closer
@@ -298,6 +300,10 @@ func (r *FSRepo) ChainDatastore() Datastore {
 	return r.chainDs
 }
 
+func (r *FSRepo) MetaDatastore() Datastore {
+	return r.metaDs
+}
+
 // Version returns the version of the repo
 func (r *FSRepo) Version() uint {
 	return r.version
@@ -320,6 +326,10 @@ func (r *FSRepo) Close() error {
 
 	if err := r.chainDs.Close(); err != nil {
 		return errors.Wrap(err, "failed to close chain datastore")
+	}
+
+	if err := r.metaDs.Close(); err != nil {
+		return errors.Wrap(err, "failed to close meta datastore")
 	}
 
 	if err := r.mds.Close(); err != nil {
@@ -430,6 +440,17 @@ func (r *FSRepo) openChainDatastore() error {
 	}
 
 	r.chainDs = ds
+
+	return nil
+}
+
+func (r *FSRepo) openMetaDatastore() error {
+	ds, err := badgerds.NewDatastore(filepath.Join(r.path, metaDatastorePrefix), badgerOptions())
+	if err != nil {
+		return err
+	}
+
+	r.metaDs = ds
 
 	return nil
 }
