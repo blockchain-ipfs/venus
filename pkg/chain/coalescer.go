@@ -136,25 +136,25 @@ func (c *HeadChangeCoalescer) coalesce(revert, apply []*block.TipSet) {
 	// similarly, newly applied tipsets cancel out with pending reverts.
 
 	// pending tipsets
-	pendRevert := make(map[block.TipSetKey]struct{}, len(c.revert))
+	pendRevert := make(map[string]struct{}, len(c.revert))
 	for _, ts := range c.revert {
-		pendRevert[ts.Key()] = struct{}{}
+		pendRevert[ts.Key().String()] = struct{}{}
 	}
 
-	pendApply := make(map[block.TipSetKey]struct{}, len(c.apply))
+	pendApply := make(map[string]struct{}, len(c.apply))
 	for _, ts := range c.apply {
-		pendApply[ts.Key()] = struct{}{}
+		pendApply[ts.Key().String()] = struct{}{}
 	}
 
 	// incoming tipsets
-	reverting := make(map[block.TipSetKey]struct{}, len(revert))
+	reverting := make(map[string]struct{}, len(revert))
 	for _, ts := range revert {
-		reverting[ts.Key()] = struct{}{}
+		reverting[ts.Key().String()] = struct{}{}
 	}
 
-	applying := make(map[block.TipSetKey]struct{}, len(apply))
+	applying := make(map[string]struct{}, len(apply))
 	for _, ts := range apply {
-		applying[ts.Key()] = struct{}{}
+		applying[ts.Key().String()] = struct{}{}
 	}
 
 	// coalesced revert set
@@ -162,7 +162,7 @@ func (c *HeadChangeCoalescer) coalesce(revert, apply []*block.TipSet) {
 	// - incoming reverts are cancelled by pending applys
 	newRevert := make([]*block.TipSet, 0, len(c.revert)+len(revert))
 	for _, ts := range c.revert {
-		_, cancel := applying[ts.Key()]
+		_, cancel := applying[ts.Key().String()]
 		if cancel {
 			continue
 		}
@@ -171,7 +171,7 @@ func (c *HeadChangeCoalescer) coalesce(revert, apply []*block.TipSet) {
 	}
 
 	for _, ts := range revert {
-		_, cancel := pendApply[ts.Key()]
+		_, cancel := pendApply[ts.Key().String()]
 		if cancel {
 			continue
 		}
@@ -184,7 +184,7 @@ func (c *HeadChangeCoalescer) coalesce(revert, apply []*block.TipSet) {
 	// - incoming applys are cancelled by pending reverts
 	newApply := make([]*block.TipSet, 0, len(c.apply)+len(apply))
 	for _, ts := range c.apply {
-		_, cancel := reverting[ts.Key()]
+		_, cancel := reverting[ts.Key().String()]
 		if cancel {
 			continue
 		}
@@ -193,7 +193,7 @@ func (c *HeadChangeCoalescer) coalesce(revert, apply []*block.TipSet) {
 	}
 
 	for _, ts := range apply {
-		_, cancel := pendRevert[ts.Key()]
+		_, cancel := pendRevert[ts.Key().String()]
 		if cancel {
 			continue
 		}
