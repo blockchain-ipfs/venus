@@ -8,8 +8,8 @@ import (
 
 	"golang.org/x/xerrors"
 
-	"github.com/filecoin-project/lotus/build"
-	"github.com/filecoin-project/lotus/node/repo"
+	"github.com/filecoin-project/venus/pkg/constants"
+	"github.com/filecoin-project/venus/pkg/repo"
 )
 
 const RFC3339nocolon = "2006-01-02T150405Z0700"
@@ -32,8 +32,12 @@ type fsJournal struct {
 
 // OpenFSJournal constructs a rolling filesystem journal, with a default
 // per-file size limit of 1GiB.
-func OpenFSJournal(lr repo.LockedRepo, disabled DisabledEvents) (Journal, error) {
-	dir := filepath.Join(lr.Path(), "journal")
+func OpenFSJournal(lr repo.Repo, disabled DisabledEvents) (Journal, error) {
+	path, err := lr.Path()
+	if err != nil {
+		return nil, err
+	}
+	dir := filepath.Join(path, "journal")
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to mk directory %s for file journal: %w", dir, err)
 	}
@@ -69,7 +73,7 @@ func (f *fsJournal) RecordEvent(evtType EventType, supplier func() interface{}) 
 
 	je := &Event{
 		EventType: evtType,
-		Timestamp: build.Clock.Now(),
+		Timestamp: constants.Clock.Now(),
 		Data:      supplier(),
 	}
 	select {
@@ -109,7 +113,7 @@ func (f *fsJournal) rollJournalFile() error {
 		_ = f.fi.Close()
 	}
 
-	nfi, err := os.Create(filepath.Join(f.dir, fmt.Sprintf("lotus-journal-%s.ndjson", build.Clock.Now().Format(RFC3339nocolon))))
+	nfi, err := os.Create(filepath.Join(f.dir, fmt.Sprintf("lotus-journal-%s.ndjson", constants.Clock.Now().Format(RFC3339nocolon))))
 	if err != nil {
 		return xerrors.Errorf("failed to open journal file: %w", err)
 	}

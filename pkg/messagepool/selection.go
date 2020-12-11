@@ -660,7 +660,9 @@ func (mp *MessagePool) getPendingMessages(curTs, ts *block.TipSet) (map[address.
 
 	// are we in sync?
 	inSync := false
-	if curTs.Height() == ts.Height() && curTs.Equals(ts) {
+	curHeight, _ := curTs.Height()
+	tsHeight, _ := ts.Height()
+	if curHeight == tsHeight && curTs.Equals(ts) {
 		inSync = true
 	}
 

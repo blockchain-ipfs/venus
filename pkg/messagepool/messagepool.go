@@ -251,7 +251,15 @@ func (ms *msgSet) add(m *types.SignedMessage, mp *MessagePool, strict, untrusted
 			return false, xerrors.Errorf("rejecting replace by fee because of nonce gap (Nonce: %d, nextNonce: %d): %v", m.Message.Nonce, nextNonce, ErrNonceGap)
 		}
 
-		if m.Cid() != exms.Cid() {
+		mc, err := m.Cid()
+		if err != nil {
+			return false, err
+		}
+		exmsc, err := exms.Cid()
+		if err != nil {
+			return false, err
+		}
+		if mc != exmsc {
 			// check if RBF passes
 			minPrice := ComputeMinRBF(exms.Message.GasPremium)
 			if tbig.Cmp(m.Message.GasPremium, minPrice) >= 0 {

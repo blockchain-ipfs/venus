@@ -76,7 +76,7 @@ func (mp *MessagePool) republishPendingMessages() error {
 	gasLimit := int64(constants.BlockGasLimit)
 	minGas := int64(gasguess.MinGas)
 	var msgs []*types.SignedMessage
-loop:
+LOOP:
 	height, _ := ts.Height()
 	for i := 0; i < len(chains); {
 		chain := chains[i]
@@ -104,7 +104,7 @@ loop:
 			for _, m := range chain.msgs {
 				if !allowNegativeChains(height) && m.Message.GasFeeCap.LessThan(baseFeeLowerBound) {
 					chain.Invalidate()
-					continue loop
+					continue LOOP
 				}
 				gasLimit -= int64(m.Message.GasLimit)
 				msgs = append(msgs, m)
