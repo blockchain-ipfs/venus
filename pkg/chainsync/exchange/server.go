@@ -25,7 +25,7 @@ type chainReader interface {
 type messageStore interface {
 	ReadMsgMetaCids(ctx context.Context, mmc cid.Cid) ([]cid.Cid, []cid.Cid, error)
 
-	LoadUnsinedMessagesFromCids(cids []cid.Cid) ([]*types.UnsignedMessage, error)
+	LoadUnsignedMessagesFromCids(cids []cid.Cid) ([]*types.UnsignedMessage, error)
 	LoadSignedMessagesFromCids(cids []cid.Cid) ([]*types.SignedMessage, error)
 }
 

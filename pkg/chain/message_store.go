@@ -39,7 +39,7 @@ type MessageProvider interface {
 	LoadTipSetMessage(ctx context.Context, ts *block.TipSet) ([]block.BlockMessagesInfo, error)
 	LoadMetaMessages(context.Context, cid.Cid) ([]*types.SignedMessage, []*types.UnsignedMessage, error)
 	ReadMsgMetaCids(ctx context.Context, mmc cid.Cid) ([]cid.Cid, []cid.Cid, error)
-	LoadUnsinedMessagesFromCids(blsCids []cid.Cid) ([]*types.UnsignedMessage, error)
+	LoadUnsignedMessagesFromCids(blsCids []cid.Cid) ([]*types.UnsignedMessage, error)
 	LoadSignedMessagesFromCids(secpCids []cid.Cid) ([]*types.SignedMessage, error)
 	LoadReceipts(context.Context, cid.Cid) ([]types.MessageReceipt, error)
 	LoadTxMeta(context.Context, cid.Cid) (types.TxMeta, error)
